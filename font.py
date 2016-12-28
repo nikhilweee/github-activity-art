@@ -46,7 +46,7 @@ class Bitmap(object):
         rows = ''
         for y in range(self.height):
             for x in range(self.width):
-                rows += '#' if self.pixels[y * self.width + x] else '-'
+                rows += '#' if self.pixels[y * self.width + x] else '.'
             rows += '\n'
         return rows
 
@@ -102,7 +102,7 @@ class Glyph(object):
 
         # The advance width is given in FreeType's 26.6 fixed point format,
         # which means that the pixel values are multiples of 64.
-        advance_width = (slot.advance.x / 64) - 1
+        advance_width = int(slot.advance.x / 64) - 1
 
         return Glyph(pixels, width, height, top, advance_width)
 
@@ -178,7 +178,7 @@ class Font(object):
 
         # The kerning offset is given in FreeType's 26.6 fixed point format,
         # which means that the pixel values are multiples of 64.
-        return kerning.x / 64
+        return int(kerning.x / 64)
 
     def text_dimensions(self, text):
         """Return (width, height, baseline) of `text` rendered in the current font."""
@@ -199,7 +199,6 @@ class Font(object):
             # Make sure we compute the total width so that all of the glyph's pixels
             # fit into the returned dimensions.
             width += max(glyph.advance_width + kerning_x, glyph.width + kerning_x)
-
             previous_char = char
 
         height = max_ascent + max_descent
@@ -215,9 +214,9 @@ class Font(object):
         # if None in (width, height, baseline):
         text_width, text_height, baseline = self.text_dimensions(text)
 
-        height, width = 7, 51
+        # offset to center text
+        x = int((width - text_width) / 2)
 
-        x  = (width - text_width) / 2
         previous_char = None
         outbuffer = Bitmap(width, height)
 
@@ -238,16 +237,3 @@ class Font(object):
             previous_char = char
 
         return outbuffer
-
-def decision():
-    # Be sure to place 'helvetica.ttf' (or any other ttf / otf font file) in the working directory.
-    # import pdb; pdb.set_trace()
-    font = Font('subway-ticker.ttf', 8, 10)
-    # Choosing the baseline correctly
-    text = repr(font.render_text('nikhil'))
-    print(text)
-    text_week = text.split('\n')[:-1]
-    decision = [list(x) for x in text_week]
-
-    # split always adds an extra element, '\n'
-    return decision
