@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+
+# Copyright (c) 2017 Nikhil Verma <nikhilweee@gmail.com>
+# Licensed under the MIT License. https://opensource.org/licenses/MIT
+
 import os
 import datetime
 import git
@@ -5,6 +10,7 @@ from font import Font
 
 
 def year_in_review():
+    """Returns the last 53 weeks as seen on the contributions graph."""
     today = datetime.datetime.today()
     difference = datetime.timedelta(6 - today.weekday())
     coming_sunday = today + difference
@@ -17,6 +23,7 @@ def year_in_review():
 
 
 def generate_stencil(text_to_render):
+    """Return pixels to be marked on the contributions graph."""
     # Be sure to place 'subway-ticker.ttf' (or any other ttf / otf font file)
     # in the working directory.
     font = Font('subway-ticker.ttf', 8, 10)
@@ -28,6 +35,7 @@ def generate_stencil(text_to_render):
 
 
 def generate_commit_dates(stencil_matrix):
+    """Convert stencil pixels to commit dates."""
     date_matrix = year_in_review()
 
     date_flattened = [

@@ -1,31 +1,11 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# Needs freetype-py>=1.0
 
 # For more info see:
 # http://dbader.org/blog/monochrome-font-rendering-with-freetype-and-python
 
-# The MIT License (MIT)
-#
 # Copyright (c) 2013 Daniel Bader (http://dbader.org)
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
+# Licensed under the MIT License. https://opensource.org/licenses/MIT
+
 
 import freetype
 
@@ -36,6 +16,7 @@ class Bitmap(object):
     of a single pixel in the bitmap. A value of 0 indicates that the pixel is `off`
     and any other value indicates that it is `on`.
     """
+
     def __init__(self, width, height, pixels=None):
         self.width = width
         self.height = height
@@ -62,13 +43,15 @@ class Bitmap(object):
                 # because glyph bitmaps may overlap if character kerning is applied, e.g.
                 # in the string "AVA", the "A" and "V" glyphs must be rendered with
                 # overlapping bounding boxes.
-                self.pixels[dstpixel] = self.pixels[dstpixel] or src.pixels[srcpixel]
+                self.pixels[dstpixel] = self.pixels[
+                    dstpixel] or src.pixels[srcpixel]
                 srcpixel += 1
                 dstpixel += 1
             dstpixel += row_offset
 
 
 class Glyph(object):
+
     def __init__(self, pixels, width, height, top, advance_width):
         self.bitmap = Bitmap(width, height, pixels)
 
@@ -142,13 +125,15 @@ class Glyph(object):
                     bit = byte_value & (1 << (7 - bit_index))
 
                     # Write the pixel to the output bytearray. We ensure that `off`
-                    # pixels have a value of 0 and `on` pixels have a value of 1.
+                    # pixels have a value of 0 and `on` pixels have a value of
+                    # 1.
                     data[rowstart + bit_index] = 1 if bit else 0
 
         return data
 
 
 class Font(object):
+
     def __init__(self, filename, height, width=0):
         self.face = freetype.Face(filename)
         self.face.set_pixel_sizes(width, height)
@@ -156,7 +141,8 @@ class Font(object):
     def glyph_for_character(self, char):
         # Let FreeType load the glyph for the given character and tell it to render
         # a monochromatic bitmap representation.
-        self.face.load_char(char, freetype.FT_LOAD_RENDER | freetype.FT_LOAD_TARGET_MONO)
+        self.face.load_char(char, freetype.FT_LOAD_RENDER |
+                            freetype.FT_LOAD_TARGET_MONO)
         return Glyph.from_glyphslot(self.face.glyph)
 
     def render_character(self, char):
@@ -198,7 +184,8 @@ class Font(object):
             # With kerning, the advance width may be less than the width of the glyph's bitmap.
             # Make sure we compute the total width so that all of the glyph's pixels
             # fit into the returned dimensions.
-            width += max(glyph.advance_width + kerning_x, glyph.width + kerning_x)
+            width += max(glyph.advance_width + kerning_x,
+                         glyph.width + kerning_x)
             previous_char = char
 
         height = max_ascent + max_descent
